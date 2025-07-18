@@ -7,6 +7,81 @@ from PIL import Image, ImageDraw
 import io
 import math
 
+from utils import arrow_score_df
+SLIDER_MIN_MAX = 5.0
+TARGET_SIZE = 100  # px
+def draw_target_with_arrow(x=None, y=None):
+    img = Image.new("RGB", (TARGET_SIZE, TARGET_SIZE), "white")
+    draw = ImageDraw.Draw(img)
+
+    center = (TARGET_SIZE // 2, TARGET_SIZE // 2)
+    colors = ["blue", "red", "red", "gold", "gold" ]
+
+    # Draw 5 concentric circles
+    for i, color in enumerate(colors):
+        r = len(colors) - i
+        r *= 10
+        draw.ellipse(
+            [center[0] - r, center[1] - r, center[0] + r, center[1] + r],
+            outline="black",
+            fill=color,
+        )
+
+    # Draw the clicked point
+    if x is not None and y is not None:
+        r = 3
+        px = int(center[0] + (x*TARGET_SIZE/2))
+        py = int(center[1] - (y*TARGET_SIZE/2))
+        draw.ellipse([px - r, py - r, px + r, py + r], fill="black")
+    
+    return img
+
+def xy_to_points(x, y):
+    """Convert x,y coordinates to arrow score point between 6 to 10."""
+    if x is None or y is None:
+        return 0
+    distance = math.sqrt(x**2 + y**2)
+    if distance < 1.0:
+        return 10
+    elif distance < 2.0:
+        return 9
+    elif distance < 3.0:
+        return 8
+    elif distance < 4.0:
+        return 7
+    elif distance < 5.0:
+        return 6
+    else:
+        return 0
+
+def arrow_input(arrow_index):
+    st.markdown(f"### Arrow {arrow_index+1}")
+    coords = [0,0]
+    col1, col2, col3 = st.columns([2,1,1])
+    with col1:
+        click_x = st.slider("X", -SLIDER_MIN_MAX, SLIDER_MIN_MAX, .0, key=f"x_{arrow_index}", step=0.1,label_visibility="collapsed")
+        click_y = st.slider("Y", -SLIDER_MIN_MAX, SLIDER_MIN_MAX, .0, key=f"y_{arrow_index}", step=0.1,label_visibility="collapsed")
+        # add a hidden input to store the score
+        points = 0
+        if click_x:
+            points = xy_to_points(click_x, click_y)
+            coords = [click_x / SLIDER_MIN_MAX, click_y / SLIDER_MIN_MAX]
+        if click_y:
+            points = xy_to_points(click_x, click_y)
+            coords = [click_x / SLIDER_MIN_MAX, click_y / SLIDER_MIN_MAX]
+
+        #score = st.number_input(f"Hidden Score {arrow_index}", value=points, key=f"hidden_score_{arrow_index}",
+        #                         min_value=0, max_value=10, step=1, label_visibility="collapsed")
+    
+    with col2:
+        image = draw_target_with_arrow(*coords)
+        st.image(image)
+    with col3:
+        st.markdown(f"# {points}")
+    
+    return click_x,click_y
+
+
 db = SessionLocal()
 
 if "selected_session_id" not in st.session_state:
@@ -16,100 +91,47 @@ if "selected_session_id" not in st.session_state:
 session_id = st.session_state["selected_session_id"]
 s:Session = db.query(Session).filter_by(id=session_id).first()
 
-st.title("🎯 Edit Session")
-st.markdown(f"**Date:** {s.timestamp.strftime('%Y-%m-%d %H:%M:%S')}  |  **Arrows/Set:** {s.arrows_per_set}")
+(col1, col2) = st.columns([1,1]) 
+with col1:
+    if st.button(" < Back to Main"):
+        st.session_state["selected_session_id"] = None
+        st.switch_page("main.py")
+
+with col2:
+    if st.button("Review Session"):
+        st.session_state["selected_session_id"] = session_id
+        st.switch_page("pages/Session_Review.py")
+
+
+st.title(f"🎯 {s.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+st.markdown(f"**Arrows/Set:** {s.arrows_per_set}")
+
+# TODO add a text area for notes
+# st.text_area("Notes", value="", key="session_notes", height=100)
 
 # Show existing sets
 st.subheader("Previous Sets")
-all_scores = []
-for i, arrow_set in enumerate(s.sets, start=1):
-    all_scores.append([a.score for a in arrow_set.arrows])
+st.table(arrow_score_df(s))
 
-
-df = pd.DataFrame(all_scores, columns=[f"Arrow {i+1}" for i in range(s.arrows_per_set)])
-st.table(df)
-
+# horizontal line accoss the page
+st.markdown("---")
 
 # Add new set
-st.subheader("Add New Set")
-coords = []
-scores = []
+results = []
+for i in range(s.arrows_per_set):
+    results.append(arrow_input(i))
 
+if st.button("Add Set"):
 
+    new_set = ArrowSet(session_id=s.id)
+    db.add(new_set)
+    db.flush()
 
-TARGET_SIZE = 100  # px
+    for x, y in results:
+        score = xy_to_points(x, y)
+        a = Arrow(set_id=new_set.id, x=x, y=y, score=score)
+        db.add(a)
 
-def draw_target_with_arrow(x=None, y=None):
-    img = Image.new("RGB", (TARGET_SIZE, TARGET_SIZE), "white")
-    draw = ImageDraw.Draw(img)
-
-    center = (TARGET_SIZE // 2, TARGET_SIZE // 2)
-    colors = ["gold", "red", "blue", "black", "white"]
-
-    # Draw 5 concentric circles
-    for i, color in enumerate(colors[::-1], start=1):
-        r = i * 10
-        draw.ellipse(
-            [center[0] - r, center[1] - r, center[0] + r, center[1] + r],
-            outline="black",
-            fill=color,
-        )
-
-    # Draw the clicked point
-    if x is not None and y is not None:
-        r = 2
-        px = int(center[0] + x)
-        py = int(center[1] - y)
-        draw.ellipse([px - r, py - r, px + r, py + r], fill="black")
-
-    return img
-
-
-
-def arrow_input(arrow_index):
-    st.markdown(f"### Arrow {arrow_index+1}")
-    
-    click_x = st.slider(f"X position (px)", -50, 50, 0, key=f"x_{arrow_index}")
-    click_y = st.slider(f"Y position (px)", -50, 50, 0, key=f"y_{arrow_index}")
-    
-    img = draw_target_with_arrow(click_x, click_y)
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    st.image(buf.getvalue(), width=100)
-
-    score = st.radio(f"Score for Arrow {arrow_index+1}", options=[10, 9, 8, 7, 6], key=f"score_{arrow_index}")
-    
-    return click_x / 5.0, click_y / 5.0, score  # scale to match -10..+10 range
-
-
-
-
-
-
-
-
-
-with st.form("add_set"):
-    
-    st.write("Click the target to add arrow positions")
-    coords = []
-    scores = []
-    for i in range(s.arrows_per_set):
-        x, y, score = arrow_input(i)
-        coords.append((x, y))
-        scores.append(score)
-        
-
-    if st.form_submit_button("Add Set"):
-        new_set = ArrowSet(session_id=s.id)
-        db.add(new_set)
-        db.flush()
-
-        for (x, y), score in zip(st.session_state["arrow_positions"], st.session_state["arrow_scores"]):
-            db.add(Arrow(set_id=new_set.id, x=x, y=y, score=score))
-
-        db.commit()
-        st.success("Set added.")
-        st.session_state["arrow_positions"] = []
-        st.session_state["arrow_scores"] = []
-        st.rerun()
+    db.commit()
+    st.success("Set added.")
+    st.rerun()
