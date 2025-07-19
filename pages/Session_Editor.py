@@ -2,26 +2,26 @@ import streamlit as st
 from auth import ENABLE_AUTH, check_auth
 from db import SessionLocal
 from models import Session, ArrowSet, Arrow
-import pandas as pd
-from streamlit_drawable_canvas import st_canvas,CanvasResult
 from PIL import Image, ImageDraw
-import io
 import math
 
 from utils import arrow_score_df
+
 if ENABLE_AUTH:
     if not check_auth():
-        st.stop() 
+        st.stop()
 
 
 SLIDER_MIN_MAX = 5.0
 TARGET_SIZE = 100  # px
+
+
 def draw_target_with_arrow(x=None, y=None):
     img = Image.new("RGB", (TARGET_SIZE, TARGET_SIZE), "white")
     draw = ImageDraw.Draw(img)
 
     center = (TARGET_SIZE // 2, TARGET_SIZE // 2)
-    colors = ["blue", "red", "red", "gold", "gold" ]
+    colors = ["blue", "red", "red", "gold", "gold"]
 
     # Draw 5 concentric circles
     for i, color in enumerate(colors):
@@ -36,11 +36,12 @@ def draw_target_with_arrow(x=None, y=None):
     # Draw the clicked point
     if x is not None and y is not None:
         r = 3
-        px = int(center[0] + (x*TARGET_SIZE/2))
-        py = int(center[1] - (y*TARGET_SIZE/2))
+        px = int(center[0] + (x * TARGET_SIZE / 2))
+        py = int(center[1] - (y * TARGET_SIZE / 2))
         draw.ellipse([px - r, py - r, px + r, py + r], fill="black")
-    
+
     return img
+
 
 def xy_to_points(x, y):
     """Convert x,y coordinates to arrow score point between 6 to 10."""
@@ -60,13 +61,30 @@ def xy_to_points(x, y):
     else:
         return 0
 
+
 def arrow_input(arrow_index):
     st.markdown(f"### Arrow {arrow_index+1}")
-    coords = [0,0]
-    col1, col2, col3 = st.columns([2,1,1])
+    coords = [0, 0]
+    col1, col2, col3 = st.columns([2, 1, 1])
     with col1:
-        click_x = st.slider("X", -SLIDER_MIN_MAX, SLIDER_MIN_MAX, .0, key=f"x_{arrow_index}", step=0.1,label_visibility="collapsed")
-        click_y = st.slider("Y", -SLIDER_MIN_MAX, SLIDER_MIN_MAX, .0, key=f"y_{arrow_index}", step=0.1,label_visibility="collapsed")
+        click_x = st.slider(
+            "X",
+            -SLIDER_MIN_MAX,
+            SLIDER_MIN_MAX,
+            0.0,
+            key=f"x_{arrow_index}",
+            step=0.1,
+            label_visibility="collapsed",
+        )
+        click_y = st.slider(
+            "Y",
+            -SLIDER_MIN_MAX,
+            SLIDER_MIN_MAX,
+            0.0,
+            key=f"y_{arrow_index}",
+            step=0.1,
+            label_visibility="collapsed",
+        )
         # add a hidden input to store the score
         points = 0
         if click_x:
@@ -76,16 +94,16 @@ def arrow_input(arrow_index):
             points = xy_to_points(click_x, click_y)
             coords = [click_x / SLIDER_MIN_MAX, click_y / SLIDER_MIN_MAX]
 
-        #score = st.number_input(f"Hidden Score {arrow_index}", value=points, key=f"hidden_score_{arrow_index}",
+        # score = st.number_input(f"Hidden Score {arrow_index}", value=points, key=f"hidden_score_{arrow_index}",
         #                         min_value=0, max_value=10, step=1, label_visibility="collapsed")
-    
+
     with col2:
         image = draw_target_with_arrow(*coords)
         st.image(image)
     with col3:
         st.markdown(f"# {points}")
-    
-    return click_x,click_y
+
+    return click_x, click_y
 
 
 db = SessionLocal()
@@ -94,11 +112,11 @@ if "selected_session_id" not in st.session_state:
     st.switch_page("main.py")
 
 session_id = st.session_state["selected_session_id"]
-s:Session = db.query(Session).filter_by(id=session_id).first()
+s: Session = db.query(Session).filter_by(id=session_id).first()
 if not s:
     st.switch_page("main.py")
 
-(col1, col2) = st.columns([1,1]) 
+(col1, col2) = st.columns([1, 1])
 with col1:
     if st.button(" < Back to Main"):
         st.session_state["selected_session_id"] = None

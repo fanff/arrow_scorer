@@ -1,4 +1,3 @@
-
 # Optional Auth Configuration
 import os
 import streamlit as st
@@ -7,9 +6,10 @@ ENABLE_AUTH = os.getenv("ENABLE_AUTH", "False") == "True"
 USERNAME = os.getenv("APP_USERNAME", "admin")
 PASSWORD = os.getenv("APP_PASSWORD", "password")
 
+
 def check_auth():
     """Simple auth form"""
-    if 'authenticated' not in st.session_state:
+    if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
 
     if not st.session_state.authenticated:

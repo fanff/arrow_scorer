@@ -14,3 +14,8 @@ dependencies = [
     "psycopg[binary]",                # PostgreSQL driver
     "pymysql",                        # MariaDB/MySQL driver
 ]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+]

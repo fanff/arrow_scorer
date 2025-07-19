@@ -11,7 +11,7 @@ from utils import pos_to_score_range
 
 if ENABLE_AUTH:
     if not check_auth():
-        st.stop() 
+        st.stop()
 
 db = SessionLocal()
 
@@ -24,7 +24,7 @@ s = db.query(Session).filter_by(id=session_id).first()
 if not s:
     st.switch_page("main.py")
 
-(col1, col2) = st.columns([1,1]) 
+(col1, col2) = st.columns([1, 1])
 with col1:
     if st.button(" < Back to Main"):
         st.session_state["selected_session_id"] = None
@@ -35,7 +35,7 @@ with col2:
         st.session_state["selected_session_id"] = session_id
         st.switch_page("pages/Session_Editor.py")
 
-        
+
 st.title("📊 Session Review")
 st.markdown(f"**Date:** {s.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -55,8 +55,6 @@ else:
     fig, mu_x, std_x, mu_y, std_y = plot_pos(arrows)
     estimated_score = 60 * avg_score
 
-    
-
     # Fancy metrics display
     st.markdown("### Key Metrics")
     with st.container():
@@ -65,10 +63,7 @@ else:
         col3.metric("Est. 60 Arrow Score", f"{estimated_score:.2f}")
 
     col4, col5 = st.columns(2)
-    col4.metric(
-        "Avg. X Position",
-        f"{pos_to_score_range(mu_x):.2f}"
-    )
+    col4.metric("Avg. X Position", f"{pos_to_score_range(mu_x):.2f}")
     col5.metric(
         "Avg. Y Position",
         f"{pos_to_score_range(mu_y):.2f}",
