@@ -10,5 +10,6 @@ dependencies = [
     "pillow>=11.3.0",
     "sqlalchemy>=2.0.41",
     "streamlit>=1.47.0",
+    "streamlit-authenticator>=0.4.2",
     "streamlit-drawable-canvas>=0.9.3",
 ]

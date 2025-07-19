@@ -3,6 +3,14 @@ from db import init_db, SessionLocal
 from models import Session
 from datetime import datetime
 
+
+from auth import ENABLE_AUTH, check_auth
+
+# Main App
+if ENABLE_AUTH:
+    if not check_auth():
+        st.stop() 
+
 init_db()
 db = SessionLocal()
 

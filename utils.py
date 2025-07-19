@@ -1,5 +1,3 @@
-
-
 from matplotlib import gridspec, pyplot as plt
 import numpy as np
 import pandas as pd
@@ -83,13 +81,29 @@ def plot_pos(arrows):
     ax_histx.set_xlim(-1.1, 1.1)
     ax_histx.axis('off')
 
-    # Histogram for Y (left)
+    # Histogram for Y (right, reversed)
     ax_histy.hist(ys, bins=30, density=True, orientation='horizontal', alpha=0.5, color='gray')
     mu_y, std_y = np.mean(ys), np.std(ys)
     y_vals = np.linspace(-1.1, 1.1, 200)
     ax_histy.plot(gaussian_pdf(y_vals, mu_y, std_y), y_vals, 'r--')
 
     ax_histy.set_ylim(-1.1, 1.1)
+    ax_histy.yaxis.tick_right()  # Move Y-axis ticks to the right
+    ax_histy.yaxis.set_label_position("right")  # Move Y-axis labels to the right
+    ax_histy.invert_xaxis()  # Reverse the Y-axis direction
     ax_histy.axis('off')
-    
-    return fig
+
+    return fig,mu_x, std_x, mu_y, std_y
+
+
+def pos_to_score_range(mu):
+    """Convert a position to a score range.
+    assumes mu is in the range [-1,1]
+    """
+    # Each ring is 0.2 wide, center is 10, edge is 1
+    abs_mu = abs(mu)
+    lower_ring = max(1, 11 - (abs_mu / 0.2))
+    upper_ring = max(1, 11 - (abs_mu / 0.2)+1 )
+    if lower_ring == upper_ring:
+        return f"{upper_ring}"
+    return lower_ring

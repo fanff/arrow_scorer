@@ -85,8 +85,7 @@ def arrow_input(arrow_index):
 db = SessionLocal()
 
 if "selected_session_id" not in st.session_state:
-    st.error("No session selected.")
-    st.stop()
+    st.switch_page("main.py")
 
 session_id = st.session_state["selected_session_id"]
 s:Session = db.query(Session).filter_by(id=session_id).first()
