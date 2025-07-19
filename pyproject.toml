@@ -11,5 +11,6 @@ dependencies = [
     "sqlalchemy>=2.0.41",
     "streamlit>=1.47.0",
     "streamlit-authenticator>=0.4.2",
-    "streamlit-drawable-canvas>=0.9.3",
+    "psycopg[binary]",                # PostgreSQL driver
+    "pymysql",                        # MariaDB/MySQL driver
 ]

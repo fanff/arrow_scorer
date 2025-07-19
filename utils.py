@@ -8,7 +8,7 @@ def arrow_score_df(s:Session):
     for i, arrow_set in enumerate(s.sets, start=1):
         all_scores.append([a.score for a in arrow_set.arrows])
 
-    columns=[f"Arrow {i+1}" for i in range(s.arrows_per_set)]
+    columns=[f"{i+1}" for i in range(s.arrows_per_set)]
     index = [i+1 for i in range(len(all_scores))]
     df = pd.DataFrame(all_scores, columns=columns
                     , index=index )

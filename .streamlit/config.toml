@@ -1,2 +1,13 @@
 [client]
 showSidebarNavigation = false
+
+[theme]
+baseFontSize = 14
+backgroundColor = "#0A0B10"
+primaryColor = "#FF4B4B"
+secondaryBackgroundColor = "#2B2C35"
+textColor = "#FAFAFA"
+
+
+[app]
+layout = 'wide'

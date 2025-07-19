@@ -1,0 +1,14 @@
+# Ignore Python virtual environments
+.venv/
+__pycache__/
+*.pyc
+
+# Ignore DB if not needed inside container
+archery.db
+
+# Ignore Git metadata
+.git/
+.gitignore
+
+# Ignore system files
+.DS_Store

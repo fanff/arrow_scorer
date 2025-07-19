@@ -1,4 +1,5 @@
 import streamlit as st
+from auth import ENABLE_AUTH, check_auth
 from db import SessionLocal
 from models import Session
 import matplotlib.pyplot as plt
@@ -7,16 +8,21 @@ from utils import arrow_score_df, plot_pos
 
 
 from utils import pos_to_score_range
+
+if ENABLE_AUTH:
+    if not check_auth():
+        st.stop() 
+
 db = SessionLocal()
 
 if "selected_session_id" not in st.session_state:
     st.switch_page("main.py")
 
-
 session_id = st.session_state["selected_session_id"]
 s = db.query(Session).filter_by(id=session_id).first()
 
-
+if not s:
+    st.switch_page("main.py")
 
 (col1, col2) = st.columns([1,1]) 
 with col1:
@@ -53,10 +59,10 @@ else:
 
     # Fancy metrics display
     st.markdown("### Key Metrics")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total Arrows", len(arrows))
-    col2.metric("Avg. Score", f"{avg_score:.2f}", f"±{std_score:.2f}")
-    col3.metric("Est. 60 Arrow Score", f"{estimated_score:.2f}")
+    with st.container():
+        col2, col3 = st.columns(2)
+        col2.metric("Avg. Score", f"{avg_score:.2f}")
+        col3.metric("Est. 60 Arrow Score", f"{estimated_score:.2f}")
 
     col4, col5 = st.columns(2)
     col4.metric(

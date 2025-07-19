@@ -1,4 +1,5 @@
 import streamlit as st
+from auth import ENABLE_AUTH, check_auth
 from db import SessionLocal
 from models import Session, ArrowSet, Arrow
 import pandas as pd
@@ -8,6 +9,11 @@ import io
 import math
 
 from utils import arrow_score_df
+if ENABLE_AUTH:
+    if not check_auth():
+        st.stop() 
+
+
 SLIDER_MIN_MAX = 5.0
 TARGET_SIZE = 100  # px
 def draw_target_with_arrow(x=None, y=None):
@@ -89,6 +95,8 @@ if "selected_session_id" not in st.session_state:
 
 session_id = st.session_state["selected_session_id"]
 s:Session = db.query(Session).filter_by(id=session_id).first()
+if not s:
+    st.switch_page("main.py")
 
 (col1, col2) = st.columns([1,1]) 
 with col1:
