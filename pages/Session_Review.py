@@ -1,5 +1,6 @@
 import streamlit as st
 from auth import ENABLE_AUTH, check_auth
+from css_addon import custom_css
 from db import SessionLocal
 from models import Session
 import matplotlib.pyplot as plt
@@ -13,6 +14,9 @@ if ENABLE_AUTH:
     if not check_auth():
         st.stop()
 
+custom_css()
+
+
 db = SessionLocal()
 
 if "selected_session_id" not in st.session_state:
@@ -24,14 +28,14 @@ s = db.query(Session).filter_by(id=session_id).first()
 if not s:
     st.switch_page("main.py")
 
-(col1, col2) = st.columns([1, 1])
+col1, col2 = st.columns([1, 1])
 with col1:
-    if st.button(" < Back to Main"):
+    if st.button(" <<",icon="🏹"):
         st.session_state["selected_session_id"] = None
         st.switch_page("main.py")
 
 with col2:
-    if st.button("Continue Session"):
+    if st.button("Continue Session",icon="▶️"):
         st.session_state["selected_session_id"] = session_id
         st.switch_page("pages/Session_Editor.py")
 

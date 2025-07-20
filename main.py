@@ -1,4 +1,5 @@
 import streamlit as st
+from css_addon import custom_css
 from db import init_db, SessionLocal
 from models import Session
 from datetime import datetime
@@ -9,11 +10,12 @@ from auth import ENABLE_AUTH, check_auth
 if ENABLE_AUTH:
     if not check_auth():
         st.stop()
+custom_css()
 
 init_db()
 db = SessionLocal()
 
-st.title("🏹 Archery Training Tracker")
+st.title("🏹 Archery Score Tracker")
 
 # Load sessions
 sessions = db.query(Session).order_by(Session.timestamp.desc()).all()
@@ -21,20 +23,21 @@ sessions = db.query(Session).order_by(Session.timestamp.desc()).all()
 # Session table
 st.subheader("Existing Sessions")
 for s in sessions:
-    col1, col2, col3 = st.columns([3, 1, 1])
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(
-            f"**{s.timestamp.strftime('%Y-%m-%d %H:%M:%S')}** - {s.arrows_per_set} arrows/set"
+            f"**{s.timestamp.strftime('%Y-%m-%d %H:%M')}**\n\n{s.arrows_per_set} arrows/set",
+            width="content"
         )
     with col2:
-        if st.button("Continue", key=f"edit_{s.id}"):
+        if st.button("Edit", key=f"edit_{s.id}" , icon="✏️"):
             st.session_state["selected_session_id"] = s.id
             st.switch_page("pages/Session_Editor.py")
     with col3:
-        if st.button("Review", key=f"review_{s.id}"):
+        if st.button("Review", key=f"review_{s.id}", icon="🔎"):
             st.session_state["selected_session_id"] = s.id
             st.switch_page("pages/Session_Review.py")
-
+    st.markdown("---")
 # Create new session
 st.subheader("Create New Session")
 with st.form("new_session"):
