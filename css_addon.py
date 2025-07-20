@@ -10,9 +10,6 @@ def custom_css():
                 flex: unset;
                 min-width: 70px !important;
             }
-            div[data-testid="stColumn"] * {
-                width: fit-content !important;
-            }
         
             span[data-testid="stIconEmoji"] {
                 margin: 0px 0.15rem 0px 0px;

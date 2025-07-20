@@ -28,7 +28,7 @@ EXPOSE 8501
 # Set Streamlit config to run in headless mode (important for containers)
 ENV STREAMLIT_SERVER_HEADLESS=true
 ENV STREAMLIT_SERVER_PORT=8501
-ENV STREAMLIT_SERVER_ENABLECORS=false
+ENV STREAMLIT_SERVER_ENABLECORS=true
 
 # Run the Streamlit app
 CMD ["streamlit", "run", "main.py"]

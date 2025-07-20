@@ -64,7 +64,17 @@ def xy_to_points(x, y):
 
 
 def arrow_input(arrow_index):
-    st.markdown(f"### Arrow {arrow_index+1}")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"### Arrow {arrow_index + 1}")
+    with col2:
+        spot_number = st.selectbox(
+            "Spot",
+            options=[1, 2, 3],
+            index=arrow_index % 3,
+        key=f"arrow_spot_{arrow_index}",
+        label_visibility="collapsed",
+    )
     coords = [0, 0]
     click_x = st.slider(
         "X",
@@ -101,7 +111,7 @@ def arrow_input(arrow_index):
     with col3:
         st.markdown(f"# {points}")
 
-    return click_x, click_y
+    return click_x, click_y, spot_number
 
 
 db = SessionLocal()
@@ -150,9 +160,9 @@ if st.button("Add Set"):
     db.add(new_set)
     db.flush()
 
-    for x, y in results:
+    for x, y, spot in results:
         score = xy_to_points(x, y)
-        a = Arrow(set_id=new_set.id, x=x, y=y, score=score)
+        a = Arrow(set_id=new_set.id, x=x, y=y, score=score, spot=spot)
         db.add(a)
 
     db.commit()

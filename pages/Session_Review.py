@@ -30,7 +30,7 @@ if not s:
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    if st.button(" <<", icon="🏹"):
+    if st.button(" ", icon="⬅️"):
         st.session_state["selected_session_id"] = None
         st.switch_page("main.py")
 
@@ -41,13 +41,13 @@ with col2:
 
 
 st.title("📊 Session Review")
-st.markdown(f"**Date:** {s.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+st.markdown(f"**Date:** {s.timestamp.strftime('%Y-%m-%d %H:%M')}")
 
 # Collect all arrows
 arrows = [a for set in s.sets for a in set.arrows]
 
-# Statistics
-st.subheader("Statistics")
+# Score
+st.subheader("Score Board")
 if not arrows:
     st.info("No data available.")
 else:

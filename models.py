@@ -32,4 +32,5 @@ class Arrow(Base):
     x = Column(Float)
     y = Column(Float)
     score = Column(Integer)
+    spot = Column(Integer, nullable=True)  # Optional spot number for scoring
     arrow_set = relationship("ArrowSet", back_populates="arrows")

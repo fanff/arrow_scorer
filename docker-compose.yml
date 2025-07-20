@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  arrow_scorer:
+    build:
+      context: .               # Path to your app (current dir)
+      dockerfile: Dockerfile   # Optional if your file is named Dockerfile
+    container_name: arrow_scorer
+    ports:
+      - "8501:8501"
+    environment:
+      STREAMLIT_SERVER_HEADLESS: "true"
+      STREAMLIT_SERVER_PORT: "8501"
+      STREAMLIT_SERVER_ENABLECORS: "true"
+      ENABLE_AUTH: "False"          # Enable auth logic in app
+      APP_USERNAME: "your_username" # Replace with desired username
+      APP_PASSWORD: "your_password" # Replace with secure password
+    volumes:
+      - ./archery.db:/app/archery.db  # Optional: persist database
+    

@@ -3,7 +3,7 @@
 __pycache__/
 *.pyc
 
-# Ignore DB if not needed inside container
+# Ignore DB inside the container
 archery.db
 
 # Ignore Git metadata
@@ -12,3 +12,8 @@ archery.db
 
 # Ignore system files
 .DS_Store
+
+# Ignore the docker-compose file
+docker-compose.yml
+# Ignore the Dockerfile
+Dockerfile
