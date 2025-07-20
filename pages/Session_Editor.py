@@ -92,14 +92,12 @@ def arrow_input(arrow_index):
     if click_y:
         points = xy_to_points(click_x, click_y)
         coords = [click_x / SLIDER_MIN_MAX, click_y / SLIDER_MIN_MAX]
-    
-    
+
     col2, col3 = st.columns(2)
 
     with col2:
         image = draw_target_with_arrow(*coords)
-        st.image(image, channels="RGBA",
-                 use_container_width="always")
+        st.image(image, channels="RGBA", use_container_width="always")
     with col3:
         st.markdown(f"# {points}")
 
@@ -118,12 +116,12 @@ if not s:
 
 (col1, col2) = st.columns([1, 1])
 with col1:
-    if st.button(" <<",icon="🏹"):
+    if st.button(" <<", icon="🏹"):
         st.session_state["selected_session_id"] = None
         st.switch_page("main.py")
 
 with col2:
-    if st.button("Review Session",icon="🔍"):
+    if st.button("Review Session", icon="🔍"):
         st.session_state["selected_session_id"] = session_id
         st.switch_page("pages/Session_Review.py")
 

@@ -30,12 +30,12 @@ if not s:
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    if st.button(" <<",icon="🏹"):
+    if st.button(" <<", icon="🏹"):
         st.session_state["selected_session_id"] = None
         st.switch_page("main.py")
 
 with col2:
-    if st.button("Continue Session",icon="▶️"):
+    if st.button("Continue Session", icon="▶️"):
         st.session_state["selected_session_id"] = session_id
         st.switch_page("pages/Session_Editor.py")
 

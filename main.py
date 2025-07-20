@@ -27,10 +27,10 @@ for s in sessions:
     with col1:
         st.markdown(
             f"**{s.timestamp.strftime('%Y-%m-%d %H:%M')}**\n\n{s.arrows_per_set} arrows/set",
-            width="content"
+            width="content",
         )
     with col2:
-        if st.button("Edit", key=f"edit_{s.id}" , icon="✏️"):
+        if st.button("Edit", key=f"edit_{s.id}", icon="✏️"):
             st.session_state["selected_session_id"] = s.id
             st.switch_page("pages/Session_Editor.py")
     with col3:
