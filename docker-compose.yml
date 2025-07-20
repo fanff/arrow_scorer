@@ -15,6 +15,6 @@ services:
       ENABLE_AUTH: "False"          # Enable auth logic in app
       APP_USERNAME: "your_username" # Replace with desired username
       APP_PASSWORD: "your_password" # Replace with secure password
+      DATABASE_URL: "sqlite:///sqlitedb/archery.db"
     volumes:
-      - ./archery.db:/app/archery.db  # Optional: persist database
-    
+      - ./sqlitedb:/app/sqlitedb  # Optional: persist database
