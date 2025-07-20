@@ -18,7 +18,7 @@ TARGET_SIZE = 100  # px
 
 
 def draw_target_with_arrow(x=None, y=None):
-    img = Image.new("RGB", (TARGET_SIZE, TARGET_SIZE), "white")
+    img = Image.new("RGBA", (TARGET_SIZE, TARGET_SIZE), color="#00000000")
     draw = ImageDraw.Draw(img)
 
     center = (TARGET_SIZE // 2, TARGET_SIZE // 2)
@@ -98,7 +98,8 @@ def arrow_input(arrow_index):
 
     with col2:
         image = draw_target_with_arrow(*coords)
-        st.image(image)
+        st.image(image, channels="RGBA",
+                 use_container_width="always")
     with col3:
         st.markdown(f"# {points}")
 
