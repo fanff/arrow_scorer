@@ -59,3 +59,17 @@ export DATABASE_URL="mysql+pymysql://user:password@localhost/dbname"
 ```bash
 export DATABASE_URL="sqlite:///archery.db"
 ```
+
+
+### Alembic Migrations
+
+Create the migration files with:
+```bash
+alembic revision --autogenerate -m "Initial migration"
+```
+
+Apply the migrations with:
+```bash
+alembic upgrade head
+``` 
+

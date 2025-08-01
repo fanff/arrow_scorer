@@ -18,6 +18,7 @@ class Session(Base):
 class ArrowSet(Base):
     __tablename__ = "arrow_sets"
     id = Column(Integer, primary_key=True)
+    some_column = Column(Float)  # Placeholder for any additional column
     session_id = Column(Integer, ForeignKey("sessions.id"))
     timestamp = Column(DateTime, nullable=True)
     session = relationship("Session", back_populates="sets")
