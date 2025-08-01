@@ -1,10 +1,10 @@
 from matplotlib import gridspec, pyplot as plt
 import numpy as np
 import pandas as pd
-from models import Session
+from models import Arrow, ArrowSet, Session
 
 
-def arrow_score_df(s: Session):
+def mark_sheet_df(s: Session):
     all_scores = []
     for i, arrow_set in enumerate(s.sets, start=1):
         all_scores.append([a.score for a in arrow_set.arrows])
@@ -20,6 +20,23 @@ def arrow_score_df(s: Session):
     df["Total"] = df["Set"].cumsum()
     return df
 
+def arrow_scores_df(s: Session):
+    """
+    Exports the arrow scores of a session to a CSV file.
+    """
+    all_scores = []
+    for arrow_set in s.sets:
+        arrow_set: ArrowSet
+        arrow_set.timestamp
+
+        for a in arrow_set.arrows:
+            a:Arrow 
+            arrow_info = a.to_dict()
+
+            arrow_info["set_timestamp"] = arrow_set.timestamp
+
+            all_scores.append(arrow_info)
+    return pd.DataFrame(all_scores)
 
 def draw_target(ax):
     """

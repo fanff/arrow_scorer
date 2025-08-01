@@ -9,5 +9,5 @@ secondaryBackgroundColor = "#2B2C35"
 textColor = "#FAFAFA"
 
 
-[app]
-layout = 'wide'
+[server]
+maxUploadSize = 3000

@@ -5,7 +5,7 @@ from db import SessionLocal
 from models import Session
 import matplotlib.pyplot as plt
 import numpy as np
-from utils import arrow_score_df, plot_pos
+from utils import mark_sheet_df, arrow_scores_df, plot_pos
 
 
 from utils import pos_to_score_range
@@ -23,9 +23,9 @@ if "selected_session_id" not in st.session_state:
     st.switch_page("main.py")
 
 session_id = st.session_state["selected_session_id"]
-s = db.query(Session).filter_by(id=session_id).first()
+current_session = db.query(Session).filter_by(id=session_id).first()
 
-if not s:
+if not current_session:
     st.switch_page("main.py")
 
 col1, col2 = st.columns([1, 1])
@@ -41,18 +41,18 @@ with col2:
 
 
 st.title("📊 Session Review")
-st.markdown(f"**Date:** {s.timestamp.strftime('%Y-%m-%d %H:%M')}")
+st.markdown(f"**Date:** {current_session.timestamp.strftime('%Y-%m-%d %H:%M')}")
 
 # Collect all arrows
-arrows = [a for set in s.sets for a in set.arrows]
+arrows = [a for set in current_session.sets for a in set.arrows]
 
 # Score
 st.subheader("Score Board")
 if not arrows:
     st.info("No data available.")
 else:
-    df = arrow_score_df(s)
-    st.table(df)
+    asdf = mark_sheet_df(current_session)
+    st.table(asdf)
 
     avg_score = sum(a.score for a in arrows) / len(arrows)
     std_score = np.std([a.score for a in arrows])
@@ -76,3 +76,25 @@ else:
     # Plot
     st.subheader("Arrow Position Plot")
     st.pyplot(fig)
+
+# Convert to DataFrame
+asdf = arrow_scores_df(current_session)
+
+st.subheader("Spot Details")
+
+st.table(asdf.groupby("spot").mean(["score", "x", "y"])[["score", "x", "y"]])
+
+
+
+# export button 
+st.subheader("Export Data")
+
+
+
+# Create download link
+st.download_button(
+    label="Download CSV",
+    data=asdf.to_csv(index=False),
+    file_name=f"session_{current_session.id}_data.csv",
+    mime="text/csv",
+)

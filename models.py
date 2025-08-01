@@ -19,6 +19,7 @@ class ArrowSet(Base):
     __tablename__ = "arrow_sets"
     id = Column(Integer, primary_key=True)
     session_id = Column(Integer, ForeignKey("sessions.id"))
+    timestamp = Column(DateTime, nullable=True)
     session = relationship("Session", back_populates="sets")
     arrows = relationship(
         "Arrow", back_populates="arrow_set", cascade="all, delete-orphan"
@@ -34,3 +35,13 @@ class Arrow(Base):
     score = Column(Integer)
     spot = Column(Integer, nullable=True)  # Optional spot number for scoring
     arrow_set = relationship("ArrowSet", back_populates="arrows")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "set_id": self.set_id,
+            "x": self.x,
+            "y": self.y,
+            "score": self.score,
+            "spot": self.spot,
+        }

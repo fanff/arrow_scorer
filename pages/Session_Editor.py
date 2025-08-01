@@ -1,3 +1,5 @@
+import datetime
+import os
 import streamlit as st
 from auth import ENABLE_AUTH, check_auth
 from css_addon import custom_css
@@ -6,7 +8,7 @@ from models import Session, ArrowSet, Arrow
 from PIL import Image, ImageDraw
 import math
 
-from utils import arrow_score_df
+from utils import mark_sheet_df
 
 if ENABLE_AUTH:
     if not check_auth():
@@ -144,7 +146,7 @@ st.markdown(f"**Arrows/Set:** {s.arrows_per_set}")
 
 # Show existing sets
 st.subheader("Previous Sets")
-st.table(arrow_score_df(s))
+st.table(mark_sheet_df(s))
 
 # horizontal line accoss the page
 st.markdown("---")
@@ -156,7 +158,7 @@ for i in range(s.arrows_per_set):
 
 if st.button("Add Set"):
 
-    new_set = ArrowSet(session_id=s.id)
+    new_set = ArrowSet(session_id=s.id, timestamp=datetime.datetime.now(datetime.timezone.utc))
     db.add(new_set)
     db.flush()
 
@@ -168,3 +170,28 @@ if st.button("Add Set"):
     db.commit()
     st.success("Set added.")
     st.rerun()
+
+
+# File uploader
+uploaded_files = st.file_uploader("Choose a file to upload", type=None, accept_multiple_files=True)
+
+
+if uploaded_files is not None:
+    for uploaded_file in uploaded_files:
+        # Show file details
+        st.subheader("File Details:")
+        st.write(f"Filename: {uploaded_file.name}")
+        st.write(f"File type: {uploaded_file.type}")
+        st.write(f"File size: {uploaded_file.size / (1024 * 1024):.2f} MB")
+
+        # Save uploaded file to disk
+        os.makedirs("uploads", exist_ok=True)
+       
+        timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M%S")
+        base, ext = os.path.splitext(uploaded_file.name)
+        save_path = os.path.join("uploads", f"{base}_{timestamp}{ext}")
+        # Save the file
+        with open(save_path, "wb") as f:
+            f.write(uploaded_file.read())
+       
+        st.success(f"File saved to: {save_path}")
