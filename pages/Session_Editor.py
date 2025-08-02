@@ -10,9 +10,8 @@ import math
 
 from utils import mark_sheet_df
 
-if ENABLE_AUTH:
-    if not check_auth():
-        st.stop()
+is_authenticated, authenticator = check_auth()
+authenticator.logout()
 custom_css()
 
 SLIDER_MIN_MAX = 5.0

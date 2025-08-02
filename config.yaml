@@ -1,0 +1,40 @@
+cookie:
+  expiry_days: 3
+  key: somerandomekey1234567890
+  name: arrow_Scorer_app
+credentials:
+  usernames:
+    fanf:
+      email: fanf@fanf.com
+      failed_login_attempts: 0 # Will be managed automatically
+      first_name: Fanf
+      last_name: Fanf
+      logged_in: True # Will be managed automatically
+      password: fanf # Will be hashed automatically
+      roles: # Optional
+      - admin
+      - editor
+      - viewer
+    test:
+      email: test@test.com
+      failed_login_attempts: 0 # Will be managed automatically
+      first_name: test
+      last_name: test
+      logged_in: False # Will be managed automatically
+      password: test # Will be hashed automatically
+      roles: # Optional
+      - viewer
+oauth2: # Optional
+  google: # Follow instructions: https://developers.google.com/identity/protocols/oauth2
+    client_id: # To be filled
+    client_secret: # To be filled
+    redirect_uri: # URL to redirect to after OAuth2 authentication
+  microsoft: # Follow instructions: https://learn.microsoft.com/en-us/graph/auth-register-app-v2
+    client_id: # To be filled
+    client_secret: # To be filled
+    redirect_uri: # URL to redirect to after OAuth2 authentication
+    tenant_id: # To be filled
+pre-authorized: # Optional
+  emails:
+  - melsby@gmail.com
+api_key: # Optional - register to receive a free API key: https://stauthenticator.com

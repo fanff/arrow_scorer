@@ -5,14 +5,15 @@ from models import Session
 from datetime import datetime
 
 
-from auth import ENABLE_AUTH, check_auth
+from auth import ENABLE_AUTH, check_auth, get_authenticator
 
-if ENABLE_AUTH:
-    if not check_auth():
-        st.stop()
+is_authenticated, authenticator = check_auth()
+authenticator.logout()
+
 custom_css()
 
 init_db()
+
 db = SessionLocal()
 
 st.title("🏹 Archery Score Tracker")

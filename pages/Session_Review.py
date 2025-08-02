@@ -10,9 +10,8 @@ from utils import mark_sheet_df, arrow_scores_df, plot_pos
 
 from utils import pos_to_score_range
 
-if ENABLE_AUTH:
-    if not check_auth():
-        st.stop()
+is_authenticated, authenticator = check_auth()
+authenticator.logout()
 
 custom_css()
 
