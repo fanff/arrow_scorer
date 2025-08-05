@@ -1,9 +1,8 @@
 import datetime
 import os
-from altair import value
 import streamlit as st
 from streamlit_image_coordinates  import streamlit_image_coordinates
-from auth import ENABLE_AUTH, check_auth
+from auth import check_auth
 from css_addon import custom_css
 from db import SessionLocal
 from models import Session, ArrowSet, Arrow
