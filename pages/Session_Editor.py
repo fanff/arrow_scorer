@@ -1,49 +1,22 @@
 import datetime
 import os
+from altair import value
 import streamlit as st
+from streamlit_image_coordinates  import streamlit_image_coordinates
 from auth import ENABLE_AUTH, check_auth
 from css_addon import custom_css
 from db import SessionLocal
 from models import Session, ArrowSet, Arrow
-from PIL import Image, ImageDraw
+
 import math
 
-from utils import mark_sheet_df
+from utils import draw_target_with_arrow, mark_sheet_df
 
 is_authenticated, authenticator = check_auth()
 authenticator.logout()
 custom_css()
 
 SLIDER_MIN_MAX = 5.0
-TARGET_SIZE = 100  # px
-
-
-def draw_target_with_arrow(x=None, y=None):
-    img = Image.new("RGBA", (TARGET_SIZE, TARGET_SIZE), color="#00000000")
-    draw = ImageDraw.Draw(img)
-
-    center = (TARGET_SIZE // 2, TARGET_SIZE // 2)
-    colors = ["blue", "red", "red", "gold", "gold"]
-
-    # Draw 5 concentric circles
-    for i, color in enumerate(colors):
-        r = len(colors) - i
-        r *= 10
-        draw.ellipse(
-            [center[0] - r, center[1] - r, center[0] + r, center[1] + r],
-            outline="black",
-            fill=color,
-        )
-
-    # Draw the clicked point
-    if x is not None and y is not None:
-        r = 3
-        px = int(center[0] + (x * TARGET_SIZE / 2))
-        py = int(center[1] - (y * TARGET_SIZE / 2))
-        draw.ellipse([px - r, py - r, px + r, py + r], fill="black")
-
-    return img
-
 
 def xy_to_points(x, y):
     """Convert x,y coordinates to arrow score point between 6 to 10."""
@@ -65,7 +38,9 @@ def xy_to_points(x, y):
 
 
 def arrow_input(arrow_index):
-    col1, col2 = st.columns(2)
+    target_size=200
+
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(f"### Arrow {arrow_index + 1}")
     with col2:
@@ -76,43 +51,38 @@ def arrow_input(arrow_index):
         key=f"arrow_spot_{arrow_index}",
         label_visibility="collapsed",
     )
-    coords = [0, 0]
-    click_x = st.slider(
-        "X",
-        -SLIDER_MIN_MAX,
-        SLIDER_MIN_MAX,
-        0.0,
-        key=f"x_{arrow_index}",
-        step=0.1,
-        label_visibility="collapsed",
-    )
-    click_y = st.slider(
-        "Y",
-        -SLIDER_MIN_MAX,
-        SLIDER_MIN_MAX,
-        0.0,
-        key=f"y_{arrow_index}",
-        step=0.1,
-        label_visibility="collapsed",
-    )
-    # add a hidden input to store the score
-    points = 0
-    if click_x:
-        points = xy_to_points(click_x, click_y)
-        coords = [click_x / SLIDER_MIN_MAX, click_y / SLIDER_MIN_MAX]
-    if click_y:
-        points = xy_to_points(click_x, click_y)
-        coords = [click_x / SLIDER_MIN_MAX, click_y / SLIDER_MIN_MAX]
-
-    col2, col3 = st.columns(2)
-
-    with col2:
-        image = draw_target_with_arrow(*coords)
-        st.image(image, channels="RGBA", use_container_width="always")
+    
+    def add_point():
+        value = st.session_state[f"score_{arrow_index}"]
+        x = value["x"]
+        y = value["y"]
+        # normalize the coordinates with the image size
+        x = (x - value["width"] // 2) / (value["width"] // 2)
+        y = (value["height"] // 2 - y) / (value["height"] // 2)
+        # set the x & y in the session state
+        st.session_state[f"px_{arrow_index}"] = x
+        st.session_state[f"py_{arrow_index}"] = y
+        
+    coords  = [st.session_state.get(f"px_{arrow_index}",default=0),
+                st.session_state.get(f"py_{arrow_index}", default=0)]
+    points = xy_to_points(coords[0]*5, coords[1]*5)
     with col3:
-        st.markdown(f"# {points}")
+        points= st.write(f"### {points}")
 
-    return click_x, click_y, spot_number
+    img = draw_target_with_arrow(*coords, target_size=target_size)
+
+    # Draw the target with the arrow coordinates
+    # and get the click coordinates
+    streamlit_image_coordinates(
+        img,
+        key=f"score_{arrow_index}",
+        use_column_width=True,
+        on_click=add_point,
+    )
+
+    return (coords[0], coords[1],
+            spot_number)
+
 
 
 db = SessionLocal()
@@ -162,8 +132,8 @@ if st.button("Add Set"):
     db.flush()
 
     for x, y, spot in results:
-        score = xy_to_points(x, y)
-        a = Arrow(set_id=new_set.id, x=x, y=y, score=score, spot=spot)
+        score = xy_to_points(x*5, y*5)
+        a = Arrow(set_id=new_set.id, x=x*5, y=y*5, score=score, spot=spot)
         db.add(a)
 
     db.commit()

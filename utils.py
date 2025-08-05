@@ -2,6 +2,33 @@ from matplotlib import gridspec, pyplot as plt
 import numpy as np
 import pandas as pd
 from models import Arrow, ArrowSet, Session
+from PIL import Image, ImageDraw
+
+def draw_target_with_arrow(x=None, y=None,target_size=100) -> Image:
+    img = Image.new("RGBA", (target_size, target_size), color="#00000000")
+    draw = ImageDraw.Draw(img)
+
+    center = (target_size // 2, target_size // 2)
+    colors = ["blue", "red", "red", "gold", "gold"]
+    r_unit =  target_size // 10  # Radius unit for the target rings
+    # Draw 5 concentric circles
+    for i, color in enumerate(colors):
+        r = len(colors) - i
+        r *= r_unit
+        draw.ellipse(
+            [center[0] - r, center[1] - r, center[0] + r, center[1] + r],
+            outline="black",
+            fill=color,
+        )
+
+    # Draw the clicked point
+    if x is not None and y is not None:
+        r = 3
+        px = int(center[0] + (x * target_size / 2))
+        py = int(center[1] - (y * target_size / 2))
+        draw.ellipse([px - r, py - r, px + r, py + r], fill="black")
+
+    return img
 
 
 def mark_sheet_df(s: Session):

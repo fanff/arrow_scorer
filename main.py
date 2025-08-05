@@ -6,6 +6,7 @@ from datetime import datetime
 
 
 from auth import ENABLE_AUTH, check_auth, get_authenticator
+from utils import draw_target_with_arrow
 
 is_authenticated, authenticator = check_auth()
 authenticator.logout()
@@ -52,3 +53,4 @@ with st.form("new_session"):
         st.session_state["selected_session_id"] = new_s.id
         st.success("Session created!")
         st.switch_page("pages/Session_Editor.py")
+
